@@ -15,16 +15,19 @@ angular
     'ngResource',
     'ngRoute',
     'ngSanitize',
+    'ui.router',
     'ngTouch'
   ])
-  .config ($routeProvider) ->
-    $routeProvider
-      .when '/',
-        templateUrl: 'views/main.html'
-        controller: 'MainCtrl'
-      .when '/about',
-        templateUrl: 'views/about.html'
-        controller: 'AboutCtrl'
-      .otherwise
-        redirectTo: '/'
-
+  .config ($stateProvider, $urlRouterProvider) ->
+    $urlRouterProvider.otherwise("/login")
+    $stateProvider
+    .state('main', {
+      url: "/main"
+      templateUrl: "views/main.html"
+      controller: 'MainCtrl'
+    })
+    .state('login', {
+      url: "/login"
+      templateUrl: "views/login.html"
+      controller: 'LoginCtrl'
+    })
