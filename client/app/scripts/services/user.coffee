@@ -47,7 +47,7 @@ angular.module('webappProtoApp')
       checkLogin: (username, password) ->
         user = getUser(username)
         if user and user.password == password
-          return true
+          return user
         else
           return false
     }

@@ -1,8 +1,14 @@
 <div>
+  <h2>Welcome {{user.username}}</h2>
   <ul>
     <li ng-repeat="mess in messages">
       <h5>{{mess.timestamp}}</h5>
       {{mess.content}}
     </li>
   </ul>
+
+  <form>
+    <textarea ng-model="new.content"></textarea>
+    <a class="btn btn-primary" ng-click="save()">Send</a>
+  <form>
 </div>

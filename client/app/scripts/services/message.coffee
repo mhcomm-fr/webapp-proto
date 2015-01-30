@@ -33,5 +33,12 @@ angular.module('webappProtoApp')
 
     return {
       messages: messages
+      newMessage: (content, user) ->
+        mess = {
+          timestamp: new Date()
+          author: user.id
+          content: content
+        }
+        messages.push(mess)
     }
   )
