@@ -17,7 +17,7 @@ Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique vitae, 
 
 
 angular.module('webappProtoApp')
-  .factory('user', () ->
+  .factory('userSrv', ($localStorage) ->
     users = [
       {
         id: 1
@@ -44,11 +44,20 @@ angular.module('webappProtoApp')
 
     return {
       getUser: getUser
+      getLogged: () ->
+        if $localStorage.currentLoggedUser?
+          return $localStorage.currentLoggedUser
+        return false
+
       checkLogin: (username, password) ->
         user = getUser(username)
         if user and user.password == password
+          $localStorage.currentLoggedUser = user
           return user
         else
           return false
+
+      logout: () ->
+        delete $localStorage.currentLoggedUser
     }
   )

@@ -8,13 +8,13 @@
  # Controller of the webappProtoApp
 ###
 angular.module('webappProtoApp')
-  .controller 'LoginCtrl', ($scope, $rootScope, user, $state) ->
+  .controller 'LoginCtrl', ($scope, userSrv, $state) ->
     $scope.credentials = {}
     $scope.loginFailed = false
     $scope.login = () ->
       {username, password} = $scope.credentials
-      if user.checkLogin(username, password)
-        $rootScope.currentUser = user.getUser(username)
-        $state.go('main')
+      logged = userSrv.checkLogin(username, password)
+      if logged
+        $state.go('user.main', {userId: logged.id})
       else
         $scope.loginFailed = true
