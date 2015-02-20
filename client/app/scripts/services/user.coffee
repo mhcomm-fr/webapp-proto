@@ -35,22 +35,21 @@ angular.module('webappProtoApp')
       }
     ]
 
-    getUser = (username) ->
-      for user in users
-        if user.username == username
-          return user
-
-      return null
-
     return {
-      getUser: getUser
+      getUser: (username) ->
+        for user in users
+          if user.username == username
+            return user
+
+        return null
+
       getLogged: () ->
         if $localStorage.currentLoggedUser?
           return $localStorage.currentLoggedUser
         return false
 
-      checkLogin: (username, password) ->
-        user = getUser(username)
+      login: (username, password) ->
+        user = @getUser(username)
         if user and user.password == password
           $localStorage.currentLoggedUser = user
           return user
