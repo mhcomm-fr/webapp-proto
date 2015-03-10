@@ -1,5 +1,3 @@
-'use strict'
-
 ###*
  # @ngdoc function
  # @name webappProtoApp.controller:MainCtrl
@@ -7,8 +5,14 @@
  # # LoginCtrl
  # Controller of the webappProtoApp
 ###
+
+
+
+
 angular.module('webappProtoApp')
   .controller 'LoginCtrl', ($scope, userSrv, $state) ->
+        
+        
     $scope.credentials = {}
     $scope.loginFailed = false
 
@@ -18,4 +22,5 @@ angular.module('webappProtoApp')
       if logged
         $state.go('user.main', {userId: logged.id})
       else
-        $scope.loginFailed = true
+        $scope.loginFailed = true                    
+        
