@@ -5,3 +5,4 @@ Other constraints:
 
 * Multi users
 * Multi patients
+* Sync we notif
