@@ -17,28 +17,18 @@ Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique vitae, 
 
 
 angular.module('webappProtoApp')
-  .factory('message', () ->
-    messages = [
-      {
-        timestamp: new Date()
-        author: 1
-        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus."
-      }
-      {
-        timestamp: new Date()
-        author: 2
-        content: "Sed sit amet ipsum mauris. Maecenas congue ligula"
-      }
-    ]
+  .factory('message', ($localStorage) ->
+
+    if !$localStorage.messages?
+      $localStorage.messages = []
 
     return {
-      messages: messages
       newMessage: (content, user) ->
         mess = {
           timestamp: new Date()
           author: user.id
           content: content
         }
-        messages.push(mess)
+        $localStorage.messages.push(mess)
     }
   )

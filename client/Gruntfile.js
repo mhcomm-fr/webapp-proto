@@ -62,7 +62,7 @@ module.exports = function (grunt) {
     },
 
     exec: {
-      start_django: {
+      startDjango: {
         command: '../server/manage.py runserver 0.0.0.0:9292',
         stdout: true,
         stderr: true
@@ -79,7 +79,7 @@ module.exports = function (grunt) {
       },
       proxies: [
         {
-           context: ['/api', '/core', '/api-auth', '/admin', '/static'],
+           context: ['/api', '/core', '/api-auth', '/admin', '/static', '/dj'],
            host: 'localhost',
            port: 9292,
            https: false

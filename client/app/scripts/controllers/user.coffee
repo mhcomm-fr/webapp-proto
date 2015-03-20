@@ -8,15 +8,12 @@
  # Controller of the webappProtoApp
 ###
 angular.module('webappProtoApp')
-  .controller 'UserCtrl', ($scope, userSrv, $state) ->
-    currentUser = userSrv.getLogged()
+  .controller 'UserCtrl', ($scope, userSrv, $state, currentUser) ->
 
-    if not currentUser?
-      $state.go('login')
+    if not currentUser
+      userSrv.gotoLogin()
 
     $scope.user = currentUser
 
     $scope.disconnect = () ->
       userSrv.logout()
-      $state.go('login')
-

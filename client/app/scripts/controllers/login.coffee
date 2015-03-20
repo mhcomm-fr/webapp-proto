@@ -12,7 +12,6 @@
 angular.module('webappProtoApp')
   .controller 'LoginCtrl', ($scope, userSrv, $state) ->
         
-        
     $scope.credentials = {}
     $scope.loginFailed = false
 

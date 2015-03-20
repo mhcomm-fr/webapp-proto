@@ -2,7 +2,7 @@
   <div class="col-md-8">
     <h2>Welcome {{user.username}}</h2>
     <ul>
-      <li ng-repeat="mess in messages">
+      <li ng-repeat="mess in $localStorage.messages">
         <h5>{{mess.timestamp}}</h5>
         {{mess.content}}
       </li>

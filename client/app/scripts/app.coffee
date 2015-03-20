@@ -20,12 +20,17 @@ angular
     'ngTouch'
   ])
   .config ($stateProvider, $urlRouterProvider) ->
-    $urlRouterProvider.otherwise("/login")
+    $urlRouterProvider.otherwise("/user/main")
     $stateProvider
     .state('user', {
-      url: "/user/:userId"
+      url: "/user"
       templateUrl: "views/base.html"
       controller: 'UserCtrl'
+      resolve: {
+        currentUser: (userSrv)->
+          return userSrv.getLogged()
+      }
+
     })
     .state('user.main', {
       url: "/main"
@@ -37,3 +42,6 @@ angular
       templateUrl: "views/login.html"
       controller: 'LoginCtrl'
     })
+  .run ($rootScope) ->
+    $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
+      console.log(error)

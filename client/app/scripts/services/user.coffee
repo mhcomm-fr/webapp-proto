@@ -17,46 +17,28 @@ Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique vitae, 
 
 
 angular.module('webappProtoApp')
-  .factory('userSrv', ($localStorage) ->
-    users = [
-      {
-        id: 1
-        username: 'admin'
-        password: 'test'
-        firtsname: 'Administrator'
-        lastname: 'TheGreat'
-      }
-      {
-        id: 2
-        username: 'demo'
-        password: 'test'
-        firtsname: 'Demo'
-        lastname: 'TheGood'
-      }
-    ]
+  .factory('userSrv', ($localStorage, $http, $log, $q, $window) ->
 
     return {
-      getUser: (username) ->
-        for user in users
-          if user.username == username
-            return user
-
-        return null
 
       getLogged: () ->
-        if $localStorage.currentLoggedUser?
-          return $localStorage.currentLoggedUser
-        return false
+        defered = $q.defer()
 
-      login: (username, password) ->
-        user = @getUser(username)
-        if user and user.password == password
-          $localStorage.currentLoggedUser = user
-          return user
-        else
-          return false
+        $http.get('/dj/get_user')
+        .success (data) ->
+          $log.debug('Connected')
+          defered.resolve(data)
+
+        .error (data, status, headers, config) ->
+          $log.debug('Not connected')
+          defered.resolve()
+
+        return defered.promise
+
+      gotoLogin: () ->
+        $window.location.href = "/api-auth/login/?next=/"
 
       logout: () ->
-        delete $localStorage.currentLoggedUser
+        $window.location.href = "/api-auth/logout/?next=/api-auth/login/"
     }
   )
