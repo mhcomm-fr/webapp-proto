@@ -8,10 +8,15 @@
  # Controller of the webappProtoApp
 ###
 angular.module('webappProtoApp')
-  .controller 'MainCtrl', ($scope, message, $state, $localStorage) ->
+  .controller 'MainCtrl', ($scope, messageSrv, $state, $localStorage) ->
 
     #$scope.messages = message.messages
     $scope.$localStorage = $localStorage
+    $scope.messages = []
+
+    messageSrv.query().$promise.then (messages) ->
+      $scope.messages = messages
+
     $scope.new = {content: ''}
 
     $scope.save = () ->

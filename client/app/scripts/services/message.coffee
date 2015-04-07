@@ -17,7 +17,7 @@ Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique vitae, 
 
 
 angular.module('webappProtoApp')
-  .factory('message', ($localStorage) ->
+  .factory('messageLocal', ($localStorage) ->
 
     if !$localStorage.messages?
       $localStorage.messages = []
@@ -31,4 +31,8 @@ angular.module('webappProtoApp')
         }
         $localStorage.messages.push(mess)
     }
+  )
+  .factory('messageSrv', ($resource) ->
+    ress = $resource('http://0.0.0.0:9000/api/messages/:_id')
+    return ress
   )
