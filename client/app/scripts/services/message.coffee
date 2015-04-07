@@ -33,6 +33,6 @@ angular.module('webappProtoApp')
     }
   )
   .factory('messageSrv', ($resource) ->
-    ress = $resource('http://0.0.0.0:9000/api/messages/:_id')
+    ress = $resource('http://0.0.0.0:9000/api/messages/:_id/')
     return ress
   )

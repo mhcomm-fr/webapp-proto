@@ -19,7 +19,10 @@ angular
     'ngStorage',
     'ngTouch'
   ])
-  .config ($stateProvider, $urlRouterProvider) ->
+  .config ($stateProvider, $urlRouterProvider, $resourceProvider, $httpProvider) ->
+    $resourceProvider.defaults.stripTrailingSlashes = false;
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     $urlRouterProvider.otherwise("/user/main")
     $stateProvider
     .state('user', {

@@ -8,18 +8,20 @@
  # Controller of the webappProtoApp
 ###
 angular.module('webappProtoApp')
-  .controller 'MainCtrl', ($scope, messageSrv, $state, $localStorage) ->
+  .controller 'MainCtrl', ($scope, messageSrv, $state, $localStorage, utils) ->
 
     #$scope.messages = message.messages
-    $scope.$localStorage = $localStorage
     $scope.messages = []
 
     messageSrv.query().$promise.then (messages) ->
       $scope.messages = messages
 
-    $scope.new = {content: ''}
+    $scope.new = new messageSrv({author:$scope.user.id, content: "", uid:utils.genUUID()})
 
     $scope.save = () ->
-      message.newMessage($scope.new.content, $scope.user)
-      $scope.new.content = ''
+      $scope.new.$save().then () ->
+        messageSrv.query().$promise.then (messages) ->
+          $scope.messages = messages
+
+        $scope.new = new messageSrv({author:$scope.user.id, content: "", uid:utils.genUUID()})
 

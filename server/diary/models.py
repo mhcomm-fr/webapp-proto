@@ -10,3 +10,6 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User)
 
+    class Meta:
+        ordering = ['-timestamp']
+
