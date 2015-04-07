@@ -6,68 +6,45 @@
  # Service of the webappProtoApp
 ###
 
-
 angular.module('webappProtoApp')
-  .factory('PushNotifSvc', ['$localStorage', '$window', '$q', ($localStorage, $window, $q) ->
+  .factory('PushNotifSvc', ['$localStorage', '$window', '$q', '$http',($localStorage, $window, $q, $http) ->
     callbacks = {}
     
+    isCompatible = $window.navigator.mozSetMessageHandler and $window.navigator.push
     
-    initialize = () ->
+    reSetHandler = () -> 
+      $window.navigator.mozSetMessageHandler('push', cbPushNotif)
+      # register endpoint change
+      $window.navigator.mozSetMessageHandler 'push-register', (e) ->
+        ###
+          function for re register push-notifications
+        ###
+        console.log('in callback of re-push')
+        console.log('push-register received, I need to register my endpoint(s) again!')
+        
+        tmpLocalCallbacks = callbacks
+        callbacks = {}
+        tmpLocalStorage = $localStorage.endPointsByName
+        $localStorage.endPointsByUrl = {} 
+        $localStorage.endPointsByName = {} 
+        for endpoint, name of tmpLocalStorage
+          registerPushNotification(name, tmpLocalCallbacks[name])
+    
+    if isCompatible
       ###
         initialize the module, you have to call it before other methods
         initalize main callback, and re-register functions
       ###
-      #callback for push notification
-      if $window.navigator.mozSetMessageHandler 
-        $window.navigator.mozSetMessageHandler('push', cbPushNotif)
-      else 
-        # No message handler
-        console.error('cannot find window.navigator.mozSetMessageHandler')
+      console.log('initializing service PushNotifSvc')
+      if ! $localStorage.endPointsByUrl
+        $localStorage.endPointsByUrl = {}
+
+      if ! $localStorage.endPointsByName
+        $localStorage.endPointsByName = {}
       
-      # register endpoint change
-      if $window.navigator.mozSetMessageHandler
-        $window.navigator.mozSetMessageHandler 'push-register', (e) ->
-          ###
-            function for re register push-notifications
-          ###
-          console.log('in callback of re-push')
-          console.log('push-register received, I need to register my endpoint(s) again!')
-          
-          tmpLocalCallbacks = callbacks
-          callbacks = {}
-          tmpLocalStorage = $localStorage.enpoints
-          $localStorage.enpoints = {} 
-          for endpoint, name of tmpLocalStorage
-            registerPushNotification(name, callbacks[name])
-      else 
-        # No message handler
-        console.log('cannot find window.navigator.mozSetMessageHandler')
-    
-    
-    isInLocalStorage = (name) ->
-      ###
-        @apiParam name name of endoint
-        
-        @apiSuccess True
-        @apiError False
-      ###
-      for endpointName in $localStorage.enpoints
-        if endpointName == name
-          return true
-      return false
-      
-    findInLocalStorage = (name) ->
-      ###
-        @apiParam name name of endoint
-        
-        @apiSuccess url of endpoint
-        @apiError null
-      ###
-      for url, endpointName of $localStorage.enpoints
-        if endpointName == name
-          return url
-      return null
-    
+    else 
+      # No message handler
+      console.warning('your web browser is not compatible with push notifications')
     
     register = (endPointName, cbFunc) -> 
       ###
@@ -79,52 +56,47 @@ angular.module('webappProtoApp')
         @apiSuccess defer
         @apiError defer
       ###
+      console.log("start register")
       defered = $q.defer()
-      if navigator.push 
-        #todo : verify syntax
-        if endPointName in callbacks
-          console.log(endPointName +" is already register")
-          defered.resolve()
-          return defered.promise
-        
-        if isInLocalStorage(endPointName)
-          callbacks[endPointName] = cbFunc
-          console.log(endPointName +" is already register, but not in local memory. doing it")
-          defered.resolve()
-          return defered.promise
-        
+      
+      if !callbacks[endPointName]
+        callbacks[endPointName] = $q.defer()
+            
+      #jerem's code
+      if !$localStorage.endPointsByName[endPointName]
         req = navigator.push.register()
         req.onsuccess = (e) ->
           endpoint = req.result
-          if ! $localStorage.enpoints 
-            $localStorage.enpoints = {}
           
-          $localStorage.enpoints[endpoint] = endPointName
-          callbacks[endPointName] = cbFunc
+          $localStorage.endPointsByName[endPointName] = {url:endpoint}
+          $localStorage.endPointsByUrl[endpoint] = {name:endPointName}
+          
+          callbacks[endPointName].resolve(cbFunc)
           console.log("registering endoint " + endPointName + " with url " + endpoint)
-          defered.resolve()
+          defered.resolve(endpoint)
         
         req.onerror = (e) ->
           console.error("Error getting a new endpoint: " + JSON.stringify(e))
           defered.reject()
-		 
-      else 
-        # No push on the DOM
-        console.error('cannot find navigator.push')
-        defered.reject()
+          callbacks[endPointName].reject()
+      else
+        callbacks[endPointName].resolve(cbFunc)
+        defered.resolve($localStorage.endPointsByName[endPointName].url)
+                      
       return defered.promise
         
     # not work yet
     unregister = (endPointName) ->
       ###
-        unregister an endpoint already register, specified by endPointName.
-      
-        @apiParam endPointName  name of endoint
+         unregister an endpoint already register, specified by endPointName.
+        
+         @apiParam endPointName  name of endoint
       ###
       defered = $q.defer()
-      endpointUrl = findInLocalStorage(endPointName)
-      if navigator.push and endpointUrl
+      endpointUrl = $localStorage.endPointsByName[endPointName].url
+      if endpointUrl
         console.log('trying to untregister endpoint '+ endPointName)
+        console.debug('with url '+ endpointUrl)
         req = navigator.push.unregister(endpointUrl)
         
         req.onsuccess = (e) ->
@@ -132,51 +104,81 @@ angular.module('webappProtoApp')
           if endpoint != endpointUrl
             console.warning('both endpoint are not equals')
             
-          $localStorage.enpoints[endpointUrl] = undefined
+          $localStorage.endPointsByUrl[endpointUrl] = undefined
+          $localStorage.endPointsByName[endPointName] = undefined
+          
           callbacks[name] = undefined 
           console.log('endpoint '+ endPointName+ ' unregistered')
           defered.resolve()
         
         req.onerror = (e) ->
           console.error("Error unregistering the endpoint: " + JSON.stringify(e));
+          console.error(e);
           defered.reject()
       
       else
-        console.error('cannot find navigator.push')
+        console.error('cannot retrieve endpoint in localStorage')
         defered.resolve()
-      
       return defered.promise
-      
     
+
     cbPushNotif = (e) -> 
       ###
         main callback for all push notification.
         this method will call the callback given to the register method.
       ###
+      console.log('in cb receive push notif')
       endpoint = e.pushEndpoint
       version = e.version
-      endPointName = $localStorage.enpoints[endpoint]
-      endPointFunc = callbacks[endPointName]
+      endPointName = $localStorage.endPointsByUrl[endpoint].name
       console.log('in push notif callback for '+ endPointName+ ' with version='+version)
-      endPointFunc(version)
+       
+      if !callbacks[endPointName]
+        callbacks[endPointName] = $q.defer()
+        
+      callbacks[endPointName].promise.then (callback) ->
+        callback(version)
+        
+        
+        
+        
+        
+      req = $http.post('http://192.168.42.103:8081', {msg:'hello word!'})
+      req.success (data, status, headers, config) ->
+        # this callback will be called asynchronously
+        # when the response is available
+        console.log('success')
+      req.error (data, status, headers, config) ->
+        # called asynchronously if an error occurs
+        # or server returns response with an error status.
+        console.log('error ')
+       
+        
       
-      
-    return {
-      register:register,
-      unregister:unregister,
-      initialize:initialize
-    }
+    if isCompatible  
+      return { 
+        register:register,
+        unregister:unregister,
+        reSetHandler:reSetHandler
+      }
+    else 
+      return {
+        register:(endPointName, cbFunc) -> console.warning('your web browser is not compatible with push notifications'),
+        unregister:(endPointName) -> console.warning('your web browser is not compatible with push notifications'),
+        reSetHandler: () ->  console.warning('your web browser is not compatible with push notifications')
+      }
 ])
-.run (PushNotifSvc) ->
+.run (PushNotifSvc, $http, $localStorage) ->
   console.log('lauching run of pushNotificationSvc')
+  nameOfCallback = "f"
   
-  PushNotifSvc.initialize()
-  promise = PushNotifSvc.register "a", (version) -> 
-    alert('callback for a with version '+ version) 
+  PushNotifSvc.reSetHandler()
   
-  promise = promise.then () ->
-    PushNotifSvc.register "b", (version) -> 
-      alert('callback for b with version '+ version)
+  promise = PushNotifSvc.register nameOfCallback, (version) -> 
+    console.log('callback for '+nameOfCallback+' with version '+ version) 
+      
+  console.log($localStorage)
+  promise.then (url) -> 
+    console.log('url : '+url)
   
-  promise.then () -> 
-    PushNotifSvc.unregister('a')
+  promise.then ()-> PushNotifSvc.unregister nameOfCallback
