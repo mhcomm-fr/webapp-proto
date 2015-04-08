@@ -19,8 +19,11 @@ Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique vitae, 
 angular.module('webappProtoApp')
   .factory('messageLocal', ($localStorage) ->
 
+    messages = []
     if !$localStorage.messages?
       $localStorage.messages = []
+    else
+       messages = $localStorage.messages
 
     return {
       newMessage: (content, user) ->
