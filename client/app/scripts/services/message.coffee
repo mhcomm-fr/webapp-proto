@@ -39,3 +39,39 @@ angular.module('webappProtoApp')
     ress = $resource('http://0.0.0.0:9000/api/messages/:_id/')
     return ress
   )
+  .factory('syncMessage', ($resource) ->
+    ress = $resource('http://0.0.0.0:9000/api/messages/:_id/')
+    return {
+      query: ress.query
+      get: ress.get
+      new: (data) ->
+        return new ress(data)
+
+    }
+  )
+  .factory('syncMessage', ($resource, $q) ->
+    class Message
+      constructor: (data) ->
+        # Do construction
+        console.log('Create new message')
+        angular.extend(this, data)
+      $save: () ->
+        console.log('Save message')
+        defered = $q.defer()
+        defered.resolve(this)
+        return defered.promise
+
+    return {
+      query: (query) ->
+        console.log('query message list')
+        defered = $q.defer()
+        defered.resolve([])
+        return {$promise:defered.promise}
+
+      get: (query) ->
+        return null
+      new: (data) ->
+        return new Message(data)
+
+    }
+  )

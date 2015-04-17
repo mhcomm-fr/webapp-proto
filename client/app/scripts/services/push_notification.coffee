@@ -168,7 +168,7 @@ angular.module('webappProtoApp')
         reSetHandler: () ->  console.warning('your web browser is not compatible with push notifications')
       }
 ])
-.run (PushNotifSvc, $http, $localStorage) ->
+###.run (PushNotifSvc, $http, $localStorage) ->
   console.log('lauching run of pushNotificationSvc')
   nameOfCallback = "f"
   
@@ -181,4 +181,4 @@ angular.module('webappProtoApp')
   promise.then (url) -> 
     console.log('url : '+url)
   
-  promise.then ()-> PushNotifSvc.unregister nameOfCallback
+  promise.then ()-> PushNotifSvc.unregister nameOfCallback###

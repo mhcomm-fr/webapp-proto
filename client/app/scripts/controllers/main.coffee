@@ -8,22 +8,22 @@
  # Controller of the webappProtoApp
 ###
 angular.module('webappProtoApp')
-  .controller 'MainCtrl', ($scope, messageSrv, tx, $state, $localStorage, utils) ->
+  .controller 'MainCtrl', ($scope, syncMessage, $state, $localStorage, utils, tx) ->
 
     #$scope.messages = message.messages
     $scope.messages = []
     $scope.tx = tx.tx
 
-    messageSrv.query().$promise.then (messages) ->
+    syncMessage.query().$promise.then (messages) ->
       $scope.messages = messages
 
-    $scope.new = new messageSrv({author:$scope.user.id, content: "", uid:utils.genUUID()})
-   
+    $scope.new = syncMessage.new({author:$scope.user.id, content: "", uid:utils.genUUID()})
+
     $scope.save = () ->
       $scope.new.$save().then () ->
-        messageSrv.query().$promise.then (messages) ->
+        syncMessage.query().$promise.then (messages) ->
           $scope.messages = messages
-        tx.newMessageToTransmit($scope.new.content)
-        
-        $scope.new = new messageSrv({author:$scope.user.id, content: "", uid:utils.genUUID()})
+
+        #tx.newMessageToTransmit($scope.new.content)
+        $scope.new = syncMessage.new({author:$scope.user.id, content: "", uid:utils.genUUID()})
 
