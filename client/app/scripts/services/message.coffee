@@ -66,6 +66,17 @@ angular.module('webappProtoApp')
         console.log('Save message')
         defered = $q.defer()
         defered.resolve(mess)
+        console.log(mess)
+        mess.sync = false
+        console.log(mess)
+        $localStorage.messages.push(mess)
+        
+        ### Add message uid to tx table ###
+        if !$localStorage.tx?
+          $localStorage.tx = []
+        tx = $localStorage.tx
+        tx.push(mess.uid)
+
         return defered.promise
 
       get: (query) ->
