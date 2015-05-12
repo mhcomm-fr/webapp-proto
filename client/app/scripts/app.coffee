@@ -17,7 +17,8 @@ angular
     'ngSanitize',
     'ui.router',
     'ngStorage',
-    'ngTouch'
+    'ngTouch',
+    'offline'
   ])
   .config ($stateProvider, $urlRouterProvider, $resourceProvider, $httpProvider) ->
     $resourceProvider.defaults.stripTrailingSlashes = false;
@@ -45,6 +46,16 @@ angular
       templateUrl: "views/login.html"
       controller: 'LoginCtrl'
     })
-  .run ($rootScope) ->
+  .run ($rootScope, connectionStatus) ->
     $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
       console.log(error)
+
+    $rootScope.isOnline = connectionStatus.isOnline()
+
+    connectionStatus.$on 'online', () ->
+      console.log('Go Online')
+      $rootScope.isOnline = true
+
+    connectionStatus.$on 'offline', () ->
+      console.log('Go offline')
+      $rootScope.isOnline = false

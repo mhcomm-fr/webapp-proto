@@ -8,7 +8,7 @@
  # Controller of the webappProtoApp
 ###
 angular.module('webappProtoApp')
-  .controller 'MainCtrl', ($scope, syncMessage, $state, $localStorage, utils, tx) ->
+  .controller 'MainCtrl', ($scope, syncMessage, $state, $localStorage, utils, tx, connectionStatus) ->
 
     $scope.messages = []
     $scope.tx = tx.tx
