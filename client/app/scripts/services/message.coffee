@@ -49,8 +49,12 @@ angular.module('webappProtoApp')
 
     }
   )
-  .factory('syncMessage', ($resource, $q, $localStorage, restMessage) ->
+  .factory('syncMessage', ($resource, $q, $localStorage, restMessage, connectionStatus, $timeout) ->
     ### Synced message resource TBD ###
+
+    #connectionStatus.$on 'online', () ->
+    #  # Check if there is message in TX to send
+
 
     if !$localStorage.messages?
       $localStorage.messages = []
@@ -82,6 +86,14 @@ angular.module('webappProtoApp')
         angular.extend(this, data)
       $save: () ->
         return syncResource.save(this)
+
+
+    poller = () ->
+      console.log("Sync message resource")
+      #syncResource.sync()
+      $timeout(poller, 1000)
+
+    poller()
 
     return syncResource
   )
