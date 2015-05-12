@@ -39,7 +39,7 @@ angular.module('webappProtoApp')
     ress = $resource('http://0.0.0.0:9000/api/messages/:_id/')
     return ress
   )
-  .factory('syncMessage', ($resource) ->
+  .factory('restMessage', ($resource) ->
     ress = $resource('http://0.0.0.0:9000/api/messages/:_id/')
     return {
       query: ress.query
@@ -49,24 +49,24 @@ angular.module('webappProtoApp')
 
     }
   )
-  .factory('syncMessage', ($resource, $q) ->
-    class Message
-      constructor: (data) ->
-        # Do construction
-        console.log('Create new message')
-        angular.extend(this, data)
-      $save: () ->
-        console.log('Save message')
-        defered = $q.defer()
-        defered.resolve(this)
-        return defered.promise
+  .factory('syncMessage', ($resource, $q, $localStorage, restMessage) ->
+    ### Synced message resource TBD ###
 
-    return {
+    if !$localStorage.messages?
+      $localStorage.messages = []
+
+    syncResource = {
       query: (query) ->
         console.log('query message list')
         defered = $q.defer()
         defered.resolve([])
         return {$promise:defered.promise}
+
+      save: (mess) ->
+        console.log('Save message')
+        defered = $q.defer()
+        defered.resolve(mess)
+        return defered.promise
 
       get: (query) ->
         return null
@@ -74,4 +74,14 @@ angular.module('webappProtoApp')
         return new Message(data)
 
     }
+
+    class Message
+      constructor: (data) ->
+        # Do construction
+        console.log('Create new message')
+        angular.extend(this, data)
+      $save: () ->
+        return syncResource.save(this)
+
+    return syncResource
   )

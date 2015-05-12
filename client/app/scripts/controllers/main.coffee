@@ -10,7 +10,6 @@
 angular.module('webappProtoApp')
   .controller 'MainCtrl', ($scope, syncMessage, $state, $localStorage, utils, tx) ->
 
-    #$scope.messages = message.messages
     $scope.messages = []
     $scope.tx = tx.tx
 
@@ -24,6 +23,5 @@ angular.module('webappProtoApp')
         syncMessage.query().$promise.then (messages) ->
           $scope.messages = messages
 
-        #tx.newMessageToTransmit($scope.new.content)
         $scope.new = syncMessage.new({author:$scope.user.id, content: "", uid:utils.genUUID()})
 
