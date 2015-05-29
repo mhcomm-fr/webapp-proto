@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'users',
     'diary',
+    'push_notif',
 )
 
 MIDDLEWARE_CLASSES = (
