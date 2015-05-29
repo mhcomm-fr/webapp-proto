@@ -85,7 +85,7 @@ angular.module('webappProtoApp')
       query: (query) ->
         console.log('query message list')
         defered = $q.defer()
-        defered.resolve([])
+        defered.resolve($localStorage.messages)
         return {$promise:defered.promise}
 
       save: (mess) ->
@@ -101,8 +101,6 @@ angular.module('webappProtoApp')
         if !$localStorage.tx?
           $localStorage.tx = []
         tx = $localStorage.tx
-        tx.push(mess.uid)
-        tx.push(mess.uid)
         tx.push(mess.uid)
 
         return defered.promise
