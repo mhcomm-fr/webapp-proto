@@ -36,14 +36,15 @@ angular.module('webappProtoApp')
     }
   )
   .factory('messageSrv', ($resource) ->
-    ress = $resource('http://0.0.0.0:9000/api/messages/:_id/')
+    ress = $resource('http://localhost:9000/api/messages/:_id/')
     return ress
   )
   .factory('restMessage', ($resource) ->
-    ress = $resource('http://0.0.0.0:9000/api/messages/:_id/')
+    ress = $resource('http://localhost:9000/api/messages/:_id/')
     return {
       query: ress.query
       get: ress.get
+      save: ress.save
       new: (data) ->
         return new ress(data)
 
@@ -60,6 +61,27 @@ angular.module('webappProtoApp')
       $localStorage.messages = []
 
     syncResource = {
+      sync: () ->
+        if $localStorage.tx and $localStorage.tx.length > 0
+          console.log("Tx: "+$localStorage.tx.length+" elem to sync")
+
+          for message in $localStorage.messages
+            if message.uid in $localStorage.tx
+              console.log("Sync msg: ", message)
+              restMessage.new(message).$save().then(
+                (value )->
+                  message.sync = true
+                  $localStorage.tx.splice($localStorage.tx.indexOf(value.uid), 1)
+                (response)->
+                 console.log("error: ", response)
+              )
+
+
+        else
+          console.log("Tx:nothing to sync")
+
+
+
       query: (query) ->
         console.log('query message list')
         defered = $q.defer()
@@ -74,11 +96,13 @@ angular.module('webappProtoApp')
         mess.sync = false
         console.log(mess)
         $localStorage.messages.push(mess)
-        
+
         ### Add message uid to tx table ###
         if !$localStorage.tx?
           $localStorage.tx = []
         tx = $localStorage.tx
+        tx.push(mess.uid)
+        tx.push(mess.uid)
         tx.push(mess.uid)
 
         return defered.promise
@@ -100,9 +124,9 @@ angular.module('webappProtoApp')
 
 
     poller = () ->
-      console.log("Sync message resource")
-      #syncResource.sync()
-      $timeout(poller, 1000)
+      #console.log("Sync message resource")
+      syncResource.sync()
+      $timeout(poller, 60000)
 
     poller()
 
