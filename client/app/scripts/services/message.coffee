@@ -36,11 +36,11 @@ angular.module('webappProtoApp')
     }
   )
   .factory('messageSrv', ($resource) ->
-    ress = $resource('http://localhost:9000/api/messages/:_id/')
+    ress = $resource('/api/messages/:_id/')
     return ress
   )
   .factory('restMessage', ($resource) ->
-    ress = $resource('http://localhost:9000/api/messages/:_id/')
+    ress = $resource('/api/messages/:_id/')
     return {
       query: ress.query
       get: ress.get
@@ -50,15 +50,21 @@ angular.module('webappProtoApp')
 
     }
   )
-  .factory('syncMessage', ($resource, $q, $localStorage, restMessage, connectionStatus, $timeout) ->
+  .factory('syncMessage', ($resource, $q, $localStorage, restMessage, connectionStatus, $timeout, $rootScope) ->
     ### Synced message resource TBD ###
 
     #connectionStatus.$on 'online', () ->
     #  # Check if there is message in TX to send
-
-
+    
+    messages = []
     if !$localStorage.messages?
       $localStorage.messages = []
+    else
+       messages = $localStorage.messages
+       
+
+    #if !$localStorage.messages?
+    #  $localStorage.messages = []
 
     syncResource = {
       sync: () ->
@@ -76,12 +82,23 @@ angular.module('webappProtoApp')
                  console.log("error: ", response)
               )
 
-
         else
           console.log("Tx:nothing to sync")
-
-
-
+        
+        msg_uid_list = []
+        for message in $localStorage.messages
+            msg_uid_list.push message.uid
+        
+        restMessage.query().$promise.then (srv_messages) ->
+          console.log("LOG1", srv_messages)
+          for srv_msg in srv_messages
+            console.log("LOG2", srv_msg)
+            if srv_msg.uid not in msg_uid_list
+              console.log("srv_msg")
+              $localStorage.messages.push(srv_msg)
+          $rootScope.$broadcast('messagesUpdated')    
+        #console.log($localStorage.messages)
+        
       query: (query) ->
         console.log('query message list')
         defered = $q.defer()
@@ -124,7 +141,7 @@ angular.module('webappProtoApp')
     poller = () ->
       #console.log("Sync message resource")
       syncResource.sync()
-      $timeout(poller, 60000)
+      $timeout(poller, 5000)
 
     poller()
 

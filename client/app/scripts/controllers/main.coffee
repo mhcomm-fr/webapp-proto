@@ -25,3 +25,8 @@ angular.module('webappProtoApp')
 
         $scope.new = syncMessage.new({author:$scope.user.id, content: "", uid:utils.genUUID()})
 
+    $scope.$on "messagesUpdated", () -> 
+      console.log("messagesUpdated")
+      syncMessage.query().$promise.then (messages) ->
+        $scope.messages = messages
+        
