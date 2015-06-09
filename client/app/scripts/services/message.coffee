@@ -56,15 +56,8 @@ angular.module('webappProtoApp')
     #connectionStatus.$on 'online', () ->
     #  # Check if there is message in TX to send
     
-    messages = []
     if !$localStorage.messages?
       $localStorage.messages = []
-    else
-       messages = $localStorage.messages
-       
-
-    #if !$localStorage.messages?
-    #  $localStorage.messages = []
 
     syncResource = {
       sync: () ->
@@ -84,20 +77,17 @@ angular.module('webappProtoApp')
 
         else
           console.log("Tx:nothing to sync")
-        
+      
+      fetch: () ->
         msg_uid_list = []
         for message in $localStorage.messages
             msg_uid_list.push message.uid
         
         restMessage.query().$promise.then (srv_messages) ->
-          console.log("LOG1", srv_messages)
           for srv_msg in srv_messages
-            console.log("LOG2", srv_msg)
             if srv_msg.uid not in msg_uid_list
-              console.log("srv_msg")
               $localStorage.messages.push(srv_msg)
-          $rootScope.$broadcast('messagesUpdated')    
-        #console.log($localStorage.messages)
+          $rootScope.$broadcast('messagesUpdated')
         
       query: (query) ->
         console.log('query message list')
@@ -141,7 +131,8 @@ angular.module('webappProtoApp')
     poller = () ->
       #console.log("Sync message resource")
       syncResource.sync()
-      $timeout(poller, 5000)
+      syncResource.fetch()
+      $timeout(poller, 10000)
 
     poller()
 
