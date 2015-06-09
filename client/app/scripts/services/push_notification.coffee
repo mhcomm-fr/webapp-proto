@@ -7,9 +7,11 @@
 ###
 
 angular.module('webappProtoApp')
-  .factory('PushNotifSvc', ['$localStorage', '$window', '$q', '$http',($localStorage, $window, $q, $http) ->
+  .factory('PushNotifSvc', ['$localStorage', '$window', '$q', '$http', 'clientSvc', ($localStorage, $window, $q, $http, clientSvc) ->
     callbacks = {}
-    
+    UID = clientSvc.getUID()
+
+
     isCompatible = $window.navigator.mozSetMessageHandler and $window.navigator.push
     
     reSetHandler = () -> 
@@ -73,6 +75,7 @@ angular.module('webappProtoApp')
           
           callbacks[endPointName].resolve(cbFunc)
           console.log("registering endoint " + endPointName + " with url " + endpoint)
+          registerOnServer(endPointName, endpoint)
           defered.resolve(endpoint)
         
         req.onerror = (e) ->
@@ -82,6 +85,7 @@ angular.module('webappProtoApp')
       else
         callbacks[endPointName].resolve(cbFunc)
         defered.resolve($localStorage.endPointsByName[endPointName].url)
+        registerOnServer(endPointName, $localStorage.endPointsByName[endPointName].url)
                       
       return defered.promise
         
@@ -109,6 +113,7 @@ angular.module('webappProtoApp')
           
           callbacks[name] = undefined 
           console.log('endpoint '+ endPointName+ ' unregistered')
+          unregisterOnServer(endPointName)
           defered.resolve()
         
         req.onerror = (e) ->
@@ -119,6 +124,7 @@ angular.module('webappProtoApp')
       else
         console.error('cannot retrieve endpoint in localStorage')
         defered.resolve()
+        unregisterOnServer(endPointName)
       return defered.promise
     
 
@@ -139,22 +145,25 @@ angular.module('webappProtoApp')
       callbacks[endPointName].promise.then (callback) ->
         callback(version)
         
-        
-        
-        
-        
-      req = $http.post('http://192.168.42.103:8081', {msg:'hello word!'})
-      req.success (data, status, headers, config) ->
-        # this callback will be called asynchronously
-        # when the response is available
-        console.log('success')
-      req.error (data, status, headers, config) ->
-        # called asynchronously if an error occurs
-        # or server returns response with an error status.
-        console.log('error ')
-       
-        
-      
+      # for test if callback is call when mobile phione is standby
+      #req = $http.post('http://192.168.42.103:8081', {msg:'hello word!'})
+      #req.success (data, status, headers, config) ->
+      #  # this callback will be called asynchronously
+      #  # when the response is available
+      #  console.log('success')
+      #req.error (data, status, headers, config) ->
+      #  # called asynchronously if an error occurs
+      #  # or server returns response with an error status.
+      #  console.log('error ')
+
+    registerOnServer = (name, endpoint) ->
+        registerUrl = '/api/client/register/'
+        $http.post(registerUrl, {uid:UID, topic_name:name, endpoint_url:endpoint})
+
+    unregisterOnServer = (name) ->
+        unregisterUrl = '/api/client/unregister/'
+        $http.post(unregisterUrl, {uid:UID, topic_name:name})
+
     if isCompatible  
       return { 
         register:register,
@@ -163,11 +172,20 @@ angular.module('webappProtoApp')
       }
     else 
       return {
-        register:(endPointName, cbFunc) -> console.warning('your web browser is not compatible with push notifications'),
-        unregister:(endPointName) -> console.warning('your web browser is not compatible with push notifications'),
-        reSetHandler: () ->  console.warning('your web browser is not compatible with push notifications')
+        register:(endPointName, cbFunc) -> console.log('your web browser is not compatible with push notifications'),
+        unregister:(endPointName) -> console.log('your web browser is not compatible with push notifications'),
+        reSetHandler: () ->  console.log('your web browser is not compatible with push notifications')
       }
 ])
+###.run (PushNotifSvc) ->
+  console.log("lauching run of pushNotificationSvc")
+  nameOfCallback = "ju_test"
+  nameOfCallback2 = "ju_test2"
+  PushNotifSvc.reSetHandler()
+  PushNotifSvc.register nameOfCallback, (version) ->
+      console.log('callback for '+nameOfCallback+' with version '+ version)
+  PushNotifSvc.register nameOfCallback2, (version) ->
+      console.log('callback for '+nameOfCallback2+' with version '+ version)###
 ###.run (PushNotifSvc, $http, $localStorage) ->
   console.log('lauching run of pushNotificationSvc')
   nameOfCallback = "f"

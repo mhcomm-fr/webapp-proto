@@ -17,38 +17,16 @@ class Client(models.Model):
     @classmethod
     def register(cls, uid, topic_name, url):
         print(uid, topic_name, url)
-        client = Client.objects.filter(uid=uid)
-        if not client:
-            client = Client(uid=uid)
-            client.save()
-        else:
-            client = client[0]
-    
-        topic = Topic.objects.filter(name=topic_name)
-        print('ici')
-        if not topic:
-            topic = Topic(name=topic_name, last_version=0)
-            topic.save()
-        else:
-            topic = topic[0]
-        
+        client, created = Client.objects.get_or_create(uid=uid)
+
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+
         print(client)
-        endpoint = Endpoint.objects.filter(client=client, topic=topic)
-        if not endpoint:
-            endpoint = Endpoint(client=client, topic=topic, endpoint_url=url)
-        else:
-            endpoint = endpoint[0]
-            if endpoint.endpoint_url != url:
-                endpoint.endpoint_url = url
+        endpoint, created = Endpoint.objects.get_or_create(client=client, topic=topic)
+  
+        endpoint.endpoint_url = url
         endpoint.save()
-        
-    def unregister(self, topic_name):
-        print('ici')
-        topic =  Topic.objects.filter(name=topic_name)
-        endpoint = Endpoint.objects.filter(client=self, topic=topic[0])
-        print('ici')
-        if endpoint:
-            endpoint.delete()
+
 
 class Topic(models.Model):
     """
@@ -57,13 +35,15 @@ class Topic(models.Model):
     #endpoints = models.ManyToManyField('Client', through='Endpoint', related_name='topic')
 
     name = models.CharField(max_length=100)
-    last_version = models.PositiveIntegerField()
+    last_version = models.PositiveIntegerField(default=0)
 
-    def notify(self):
-        self.last_version += 1
-        self.save()
-        for endpoint in self.endpoints.all():
-            endpoint.notify(self.last_version)
+    @classmethod
+    def notify(cls, topic_id):
+        topic = Topic.objects.get(id=topic_id)
+        topic.last_version += 1
+        topic.save()
+        for endpoint in topic.endpoints.all():
+            endpoint.notify(topic.last_version)
             
 
 class Endpoint(models.Model):
