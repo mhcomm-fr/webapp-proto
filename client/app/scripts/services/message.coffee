@@ -55,14 +55,29 @@ angular.module('webappProtoApp')
 
     #connectionStatus.$on 'online', () ->
     #  # Check if there is message in TX to send
+
+    # Add tx queue if necessary
+    if !$localStorage.tx?
+      $localStorage.tx = []
     
     if !$localStorage.messages?
       $localStorage.messages = []
 
+
+    class Message
+      constructor: (data) ->
+        # Do construction
+        console.log('Create new message')
+        @timestamp = new Date()
+        angular.extend(this, data)
+      $save: () ->
+        return syncResource.save(this)
+
+
     syncResource = {
       sync: () ->
-        if $localStorage.tx and $localStorage.tx.length > 0
-          console.log("Tx: "+$localStorage.tx.length+" elem to sync")
+        if $localStorage.tx.length > 0
+          console.log("Tx: " + $localStorage.tx.length + " elem to sync")
 
           for message in $localStorage.messages
             if message.uid in $localStorage.tx
@@ -98,17 +113,17 @@ angular.module('webappProtoApp')
       save: (mess) ->
         console.log('Save message')
         defered = $q.defer()
-        defered.resolve(mess)
-        console.log(mess)
         mess.sync = false
-        console.log(mess)
+
+        # Add message to localstorage
         $localStorage.messages.push(mess)
+        $localStorage.messages.sort((e) -> e.timestamp)
+        $localStorage.messages.reverse()
 
         ### Add message uid to tx table ###
-        if !$localStorage.tx?
-          $localStorage.tx = []
-        tx = $localStorage.tx
-        tx.push(mess.uid)
+        $localStorage.tx.push(mess.uid)
+
+        defered.resolve(mess)
 
         return defered.promise
 
@@ -119,19 +134,11 @@ angular.module('webappProtoApp')
 
     }
 
-    class Message
-      constructor: (data) ->
-        # Do construction
-        console.log('Create new message')
-        angular.extend(this, data)
-      $save: () ->
-        return syncResource.save(this)
-
 
     poller = () ->
-      #console.log("Sync message resource")
-      syncResource.sync()
-      syncResource.fetch()
+      console.log("Sync message resource")
+      #syncResource.sync()
+      #syncResource.fetch()
       $timeout(poller, 10000)
 
     poller()

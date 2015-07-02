@@ -2,9 +2,10 @@
   <div class="col-md-8">
     <h2>Welcome {{user.username}} (<span ng-hide="isOnline">Offline</span><span ng-show="isOnline">Online</span>)</h2>
     <ul>
+      <!--li ng-repeat="mess in messages| orderBy :'timestamp':true"-->
       <li ng-repeat="mess in messages">
-        <h5>{{mess.timestamp}}</h5>
-        {{mess.content}}
+        <h5>{{mess.timestamp| date : 'short'}}</h5>
+        {{mess.content}} - {{mess.sync}}
       </li>
     </ul>
   </div>
