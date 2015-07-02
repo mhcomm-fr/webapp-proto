@@ -13,22 +13,25 @@ angular.module('webappProtoApp')
     $scope.messages = []
     $scope.tx = tx.tx
 
-    syncMessage.query().$promise.then (messages) ->
-      $scope.messages = messages
+    $scope.msgSrv = syncMessage
+
+    #syncMessage.query().$promise.then (messages) ->
+    #  $scope.messages = messages
 
     $scope.new = syncMessage.new({author:$scope.user.id, content: "", uid:utils.genUUID()})
 
     $scope.save = () ->
       $scope.new.$save().then () ->
-        syncMessage.query().$promise.then (messages) ->
-          $scope.messages = messages
+        #syncMessage.query().$promise.then (messages) ->
+        #  $scope.messages = messages
 
         $scope.new = syncMessage.new({author:$scope.user.id, content: "", uid:utils.genUUID()})
 
-    $scope.$on "messagesUpdated", () ->
+    ###$scope.$on "messagesUpdated", () ->
       console.log("messagesUpdated")
       syncMessage.query().$promise.then (messages) ->
-        $scope.messages = messages
+        $scope.messages = messages###
+        
   .run (PushNotifSvc, syncMessage) ->
     PushNotifSvc.reSetHandler()
     console.log 'launching RUN'

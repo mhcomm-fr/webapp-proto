@@ -53,8 +53,6 @@ angular.module('webappProtoApp')
   .factory('syncMessage', ($resource, $q, $localStorage, restMessage, connectionStatus, $timeout, $rootScope) ->
     ### Synced message resource TBD ###
 
-    #connectionStatus.$on 'online', () ->
-    #  # Check if there is message in TX to send
     resourceName = 'messages'
     queueName = '_tx' + resourceName
 
@@ -77,54 +75,68 @@ angular.module('webappProtoApp')
 
 
     syncResource = {
+      isOnline: connectionStatus.isOnline()
       sync: () ->
-        if $localStorage[queueName].length > 0
-          console.log("Tx: " + $localStorage[queueName].length + " elem(s) to sync")
+        if $localStorage[queueName]
+          console.log("Tx: " + $localStorage[queueName].length + " elem(s) to sync.")
 
           for message in $localStorage[resourceName]
             if message.uid in $localStorage[queueName]
-              console.log("Sync msg: ", message)
               restMessage.new(message).$save().then(
-                (value )->
+                (value)->
                   message.needSync = false
                   $localStorage[queueName].splice($localStorage[queueName].indexOf(value.uid), 1)
                 (response)->
-                 console.log("error: ", response)
+                  console.log("error: ", response)
               )
-
-        else
-          console.log("Tx:nothing to sync")
 
       fetch: () ->
         # TODO limit qte of elt fetched
         restMessage.query().$promise.then (srv_messages) ->
           msg_uid_list = (message.uid for message in $localStorage[resourceName])
           $localStorage[resourceName] = srv_messages
+          $localStorage[resourceName].sort (f,s) ->
+            a = new Date(f.timestamp)
+            b = new Date(s.timestamp)
+            return a>b ? 1 : (a<b ? -1 : 0)
+          $localStorage[resourceName].reverse()
+
           # TODO differential update
           ###for srv_msg in srv_messages
             if srv_msg.uid not in msg_uid_list
               $localStorage[ressName].push(srv_msg)
           for uid in msg_uid_list###
-          $rootScope.$broadcast('messagesUpdated')
+
+          #$rootScope.$broadcast('messagesUpdated')
 
       query: (query) ->
-        console.log('query message list')
+        console.log('Query message list')
         defered = $q.defer()
         defered.resolve($localStorage[resourceName])
-        return {$promise:defered.promise}
+        return {$promise: defered.promise}
 
       save: (mess) ->
         console.log('Save message')
+
         defered = $q.defer()
         mess.needSync = true
 
         # Add message to localstorage
         $localStorage[resourceName].push(mess)
-        $localStorage[resourceName].sort((e) -> e.timestamp)
+        $localStorage[resourceName].sort (f,s) ->
+          a = new Date(f.timestamp)
+          b = new Date(s.timestamp)
+          return a>b ? 1 : a<b ? -1 : 0
         $localStorage[resourceName].reverse()
+
+        console.log($localStorage[resourceName])
 
         ### Add message uid to tx table ###
         $localStorage[queueName].push(mess.uid)
+
+        # Immediat sync if online
+        if @isOnline
+          @sync()
 
         defered.resolve(mess)
 
@@ -135,13 +147,24 @@ angular.module('webappProtoApp')
       new: (data) ->
         return new Message(data)
 
+      getData: () ->
+        return $localStorage[resourceName]
+
     }
 
+    connectionStatus.$on 'online', () ->
+      # Check if there is message in TX to send
+      syncResource.isOnline = true
+      syncResource.sync()
+
+    connectionStatus.$on 'offline', () ->
+      syncResource.isOnline = false
 
     poller = () ->
-      console.log("Sync message resource")
-      syncResource.sync()
-      # syncResource.fetch() # do it in push notification
+      if syncResource.isOnline
+        console.log("Sync message resource")
+        syncResource.sync()
+        #syncResource.fetch()
       $timeout(poller, 5000)
 
     poller()
