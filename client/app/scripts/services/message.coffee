@@ -61,7 +61,7 @@ angular.module('webappProtoApp')
     # Add tx queue if necessary
     if !$localStorage[queueName]?
       $localStorage[queueName] = []
-    
+
     if !$localStorage[resourceName]?
       $localStorage[resourceName] = []
 
@@ -94,7 +94,7 @@ angular.module('webappProtoApp')
 
         else
           console.log("Tx:nothing to sync")
-      
+
       fetch: () ->
         # TODO limit qte of elt fetched
         restMessage.query().$promise.then (srv_messages) ->
@@ -106,7 +106,7 @@ angular.module('webappProtoApp')
               $localStorage[ressName].push(srv_msg)
           for uid in msg_uid_list###
           $rootScope.$broadcast('messagesUpdated')
-        
+
       query: (query) ->
         console.log('query message list')
         defered = $q.defer()
@@ -141,7 +141,7 @@ angular.module('webappProtoApp')
     poller = () ->
       console.log("Sync message resource")
       syncResource.sync()
-      syncResource.fetch()
+      #syncResource.fetch() # do it in push notification
       $timeout(poller, 5000)
 
     poller()

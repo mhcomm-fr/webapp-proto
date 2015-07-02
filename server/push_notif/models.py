@@ -10,9 +10,9 @@ class Client(models.Model):
     A client
     """
     uid = models.CharField(max_length=100)
-    
+
     topics = models.ManyToManyField('Topic', through='Endpoint', related_name='clients')
-    
+
     # when create Client  ?
     @classmethod
     def register(cls, uid, topic_name, url):
@@ -23,7 +23,7 @@ class Client(models.Model):
 
         print(client)
         endpoint, created = Endpoint.objects.get_or_create(client=client, topic=topic)
-  
+
         endpoint.endpoint_url = url
         endpoint.save()
 
@@ -44,7 +44,7 @@ class Topic(models.Model):
         topic.save()
         for endpoint in topic.endpoints.all():
             endpoint.notify(topic.last_version)
-            
+
 
 class Endpoint(models.Model):
     """
@@ -55,8 +55,8 @@ class Endpoint(models.Model):
     endpoint_url = models.URLField()
 
     def notify(self, version):
+        print('calling url : %r with versio %r' % self.endpoint_url, version)
         ret = requests.put(self.endpoint_url, data={'version': version})
         if ret.status_code != 200:
             print('push notification : error notifying url')
             # todo : real error handling
-
