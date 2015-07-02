@@ -12,5 +12,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = models.Message.objects.all()
 
     def perform_create(self, serializer):
-        topic_id = Topic.filter(name='msg')[0]
-        Topic.notify(topic_id)
+        super(MessageViewSet, self).perform_create(serializer)
+        try:
+            topic_id = Topic.objects.get(name='msg').id
+            Topic.notify(topic_id)
+        except Topic.DoesNotExist:
+            pass

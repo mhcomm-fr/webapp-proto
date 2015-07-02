@@ -55,7 +55,7 @@ class Endpoint(models.Model):
     endpoint_url = models.URLField()
 
     def notify(self, version):
-        print('calling url : %r with versio %r' % self.endpoint_url, version)
+        print('calling url : %r with version %r' % (self.endpoint_url, version))
         ret = requests.put(self.endpoint_url, data={'version': version})
         if ret.status_code != 200:
             print('push notification : error notifying url')

@@ -141,7 +141,7 @@ angular.module('webappProtoApp')
     poller = () ->
       console.log("Sync message resource")
       syncResource.sync()
-      #syncResource.fetch() # do it in push notification
+      # syncResource.fetch() # do it in push notification
       $timeout(poller, 5000)
 
     poller()
