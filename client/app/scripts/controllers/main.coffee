@@ -11,7 +11,16 @@ angular.module('webappProtoApp')
   .controller 'MainCtrl', ($scope, syncMessage, $state, $localStorage, utils, tx, connectionStatus) ->
 
     $scope.messages = []
-    $scope.tx = tx.tx
+
+
+    $scope.install = () ->
+      manifestUrl = './manifest.webapp';
+      req = navigator.mozApps.installPackage(manifestUrl)
+      req.onsuccess = () ->
+          alert(this.result.origin)
+      req.onerror = () ->
+          alert(this.error.name)
+
 
     $scope.msgSrv = syncMessage
 
