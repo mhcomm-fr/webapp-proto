@@ -46,7 +46,7 @@ angular.module('webappProtoApp')
       
     else 
       # No message handler
-      console.warning('your web browser is not compatible with push notifications')
+      console.log('your web browser is not compatible with push notifications')
     
     register = (endPointName, cbFunc) -> 
       ###
@@ -106,7 +106,7 @@ angular.module('webappProtoApp')
         req.onsuccess = (e) ->
           endpoint = req.result
           if endpoint != endpointUrl
-            console.warning('both endpoint are not equals')
+            console.log('both endpoint are not equals')
             
           $localStorage.endPointsByUrl[endpointUrl] = undefined
           $localStorage.endPointsByName[endPointName] = undefined
