@@ -1,5 +1,6 @@
 <div class="clearfix">
   <div class="col-md-12">
+    <a class="btn btn-primary pull-right" ng-click="install()">Install</a>
     <h2>Welcome {{user.username}} (<span ng-hide="isOnline">Offline</span><span ng-show="isOnline">Online</span>)</h2>
     <form>
       <textarea ng-model="new.content"></textarea>
@@ -13,6 +14,4 @@
       </li>
     </ul>
   </div>
-
-  <a class="btn btn-primary pull-right" ng-click="install()">Install</a>
 </div>

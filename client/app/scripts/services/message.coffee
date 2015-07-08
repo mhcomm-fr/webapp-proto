@@ -93,7 +93,7 @@ angular.module('webappProtoApp')
               )
 
       fetch: () ->
-        # TODO limit qte of elt fetched
+        # TODO limit qte of elt fetched by filtering with date
         restMessage.query().$promise.then (srv_messages) ->
           msg_uid_list = (message.uid for message in $localStorage[resourceName])
           $localStorage[resourceName] = srv_messages

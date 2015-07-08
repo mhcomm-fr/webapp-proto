@@ -8,12 +8,13 @@
  # Controller of the webappProtoApp
 ###
 angular.module('webappProtoApp')
-  .controller 'MainCtrl', ($scope, syncMessage, $state, $localStorage, utils, tx, connectionStatus) ->
+  .controller 'MainCtrl', ($scope, syncMessage, $state, $localStorage, utils, $location) ->
 
     $scope.messages = []
 
     $scope.install = () ->
-      manifestUrl = '/manifest.webapp';
+      manifestUrl = $location.protocol() + "://" + $location.host() + ":" + $location.port() + '/manifest.webapp'
+      console.log(manifestUrl)
       req = navigator.mozApps.install(manifestUrl)
       req.onsuccess = () ->
           alert(this.result.origin)
