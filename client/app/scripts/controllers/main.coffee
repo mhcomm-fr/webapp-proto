@@ -16,10 +16,13 @@ angular.module('webappProtoApp')
       manifestUrl = $location.protocol() + "://" + $location.host() + ":" + $location.port() + '/manifest.webapp'
       console.log(manifestUrl)
       req = navigator.mozApps.install(manifestUrl)
+      console.log('ok')
       req.onsuccess = () ->
-          alert(this.result.origin)
+          console.log('Youhou')
+          console.log(this.result.origin)
       req.onerror = () ->
-          alert(this.error.name)
+          console.log('Hoooooo')
+          console.log(this.error.name)
 
     $scope.msgSrv = syncMessage
 

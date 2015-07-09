@@ -57,6 +57,10 @@ angular.module('webappProtoApp')
     
     resourceName = 'messages'
     queueName = '_tx' + resourceName
+    feched = '_fetched' + resourceName
+
+    if !$localStorage[feched]?
+      $localStorage[feched] = false
 
     # Add tx queue if necessary
     if !$localStorage[queueName]?
@@ -94,7 +98,7 @@ angular.module('webappProtoApp')
 
       fetch: () ->
         # TODO limit qte of elt fetched by filtering with date
-        restMessage.query().$promise.then (srv_messages) ->
+        return restMessage.query().$promise.then (srv_messages) ->
           msg_uid_list = (message.uid for message in $localStorage[resourceName])
           $localStorage[resourceName] = srv_messages
           $localStorage[resourceName].sort (f,s) ->
@@ -114,6 +118,12 @@ angular.module('webappProtoApp')
       query: (query) ->
         console.log('Query message list')
         defered = $q.defer()
+
+        # Initial fetch
+        if not $localStorage[feched]
+            $localStorage[feched] = true
+            syncResource.fetch()
+
         defered.resolve($localStorage[resourceName])
         return {$promise: defered.promise}
 

@@ -7,3 +7,42 @@
         "url": "http://my-server.com"
     }
 }
+
+{
+  "version": "0.1.0",
+  "name": "webapp proto",
+  "description": "A template with the bare minimum structure",
+  "launch_path": "/index.html",
+  "icons": {
+    "16": "/img/icons/icon16x16.png",
+    "48": "/img/icons/icon48x48.png",
+    "60": "/img/icons/icon60x60.png",
+    "128": "/img/icons/icon128x128.png"
+  },
+  "developer": {
+    "name": "Your name",
+    "url": "http://example.com"
+  },
+  "_type": "privileged",
+  "installs_allowed_from": [
+    "*"
+  ],
+  "locales": {
+    "fr": {
+      "name": "test test jr",
+      "description": "Bla bla bla bla",
+      "permissions": {}
+    }
+  },
+  "default_locale": "en",
+
+  "messages": [
+      { "push": "/index.html"},
+      { "push-register": "/index.html"}
+  ],
+  "permissions": {
+    "push": {
+      "description": "Required for being updated when new messages arrives"
+    }
+  }
+}
