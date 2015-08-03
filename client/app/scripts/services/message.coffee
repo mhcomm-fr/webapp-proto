@@ -52,9 +52,7 @@ angular.module('webappProtoApp')
   )
   .factory('syncMessage', ['$resource', '$q', '$localStorage', 'restMessage', 'connectionStatus', '$timeout', '$rootScope', 'NotifSvc', ($resource, $q, $localStorage, restMessage, connectionStatus, $timeout, $rootScope, NotifSvc) ->
     ### Synced message resource TBD ###
-    
-    NotifSvc.addNotif() #TODO: testing Notif service
-    
+
     resourceName = 'messages'
     queueName = '_tx' + resourceName
     feched = '_fetched' + resourceName

@@ -9,16 +9,39 @@
 
 angular.module('webappProtoApp')
   .factory('NotifSvc', ($window, $timeout) ->
-    result = 'denied'
-    Notification.requestPermission()
-  
-    addNotif = () ->
-      notification = new Notification("Hi there!",{body:'I am here to talk about HTML5 Web Notification API',icon:'icon.png',dir:'auto'})
-      $timeout(()->
+    if Notification.permission isnt "granted"
+      Notification.requestPermission (perm) ->
+        Notification.permission = perm
+
+    onError = () ->
+      console.log 'error on notif'
+    onShow = () ->
+      console.log 'showing notif'
+    onClick = () ->
+      console.log 'click on notif'
+    onClose = () ->
+      console.log 'closing notif'
+
+    addNotif = (title, options) ->
+      console.log 'permision : ', Notification.permission
+
+      # notification = new Notification title, options
+      notification = new Notification title, options
+      notification.onerror = onError
+      notification.onclick = onClick
+      notification.onshow = onShow
+      notification.onclose = onClose
+
+      $timeout( ()->
         notification.close()
-      , 2000)
-    
+      , 5000)
+
+      return notification
+
     return {
-      addNotif: addNotif 
+      addNotif: addNotif
     }
   )
+.run (NotifSvc, $timeout) ->
+  console.log 'run of notif'
+  notif = NotifSvc.addNotif 'test', {body:'I am here to be sure that notifications works', dir:'auto', icon:'https://taiga.mhcomm.fr/images/favicon.png', TAG:"NOTIF"}

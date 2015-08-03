@@ -18,11 +18,17 @@
         },
         {
             "push-register": "/index.html"
+        },
+        {
+            "notification": "/index.html"
         }
     ],
     "permissions": {
         "push": {
             "description": "Required for being updated when new messages arrives"
+        },
+        "desktop-notification":{
+            "description": "Required for notify user"
         }
     }
 }

@@ -32,11 +32,21 @@ angular.module('webappProtoApp')
       $scope.new.$save().then () ->
 
         $scope.new = syncMessage.new({author:$scope.user.id, content: "", uid:utils.genUUID()})
-        
-  .run (PushNotifSvc, syncMessage) ->
+
+  .run (PushNotifSvc, syncMessage, NotifSvc) ->
     PushNotifSvc.reSetHandler()
     console.log 'launching RUN'
     PushNotifSvc.register('msg', (version) ->
       console.log('bla  ', version)
-      syncMessage.fetch()
+      syncMessage.fetch().then ()->
+        messages = syncMessage.getData()
+        message = messages[0].content
+        console.log 'rcv message : ',message
+        options={
+          TAG:'msg',
+          icon:"https://taiga.mhcomm.fr/images/favicon.png",
+          body:'message : "'+message+'"',
+          dir:'rtl'
+        }
+        NotifSvc.addNotif 'new msg receive', options
     )
