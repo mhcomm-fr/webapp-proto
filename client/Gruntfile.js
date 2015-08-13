@@ -18,7 +18,7 @@ module.exports = function (grunt) {
   // Configurable paths for the application
   var appConfig = {
     app: require('./bower.json').appPath || 'app',
-    dist: 'dist'
+    dist: 'www'
   };
 
   // Define the configuration for all the tasks
@@ -62,7 +62,7 @@ module.exports = function (grunt) {
     },
 
     exec: {
-      startDjango: {
+      runserver: {
         command: '../server/manage.py runserver 0.0.0.0:9292',
         stdout: true,
         stderr: true
@@ -460,5 +460,9 @@ module.exports = function (grunt) {
     'newer:jshint',
     'test',
     'build'
+  ]);
+
+  grunt.registerTask('runserver', [
+    'exec:runserver'
   ]);
 };

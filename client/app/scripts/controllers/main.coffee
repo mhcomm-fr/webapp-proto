@@ -8,7 +8,10 @@
  # Controller of the webappProtoApp
 ###
 angular.module('webappProtoApp')
-  .controller 'MainCtrl', ($scope, syncMessage, $state, $localStorage, utils, $location) ->
+  .controller 'MainCtrl', ($scope, syncMessage, $state, $localStorage, utils, $location, cordova) ->
+
+    cordova.ready.then () ->
+      console.log('Cordova loaded')
 
     $scope.messages = []
 
