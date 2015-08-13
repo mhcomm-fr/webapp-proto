@@ -1,9 +1,11 @@
 node_modules
 dist
 www
+*.lock
 .tmp
 .sass-cache
 bower_components
 .idea
 *.pyc
 db.sqlite3
+build
