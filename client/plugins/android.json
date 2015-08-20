@@ -20,6 +20,9 @@
     "installed_plugins": {
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "fr.mhcomm.webappproto"
+        },
+        "cordova-plugin-console": {
+            "PACKAGE_NAME": "fr.mhcomm.webappproto"
         }
     },
     "dependent_plugins": {}

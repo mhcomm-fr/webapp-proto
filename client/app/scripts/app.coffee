@@ -24,8 +24,15 @@ angular
     $resourceProvider.defaults.stripTrailingSlashes = false;
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-    $urlRouterProvider.otherwise("/user/main")
+    #$urlRouterProvider.otherwise("/user/main")
+    $urlRouterProvider.otherwise("/test")
+    
     $stateProvider
+    .state('test', {
+      url: "/test"
+      templateUrl: "views/test.html"
+      controller: 'TestCtrl'
+    })
     .state('user', {
       url: "/user"
       templateUrl: "views/base.html"
@@ -46,7 +53,7 @@ angular
       templateUrl: "views/login.html"
       controller: 'LoginCtrl'
     })
-  .run ($rootScope, connectionStatus) ->
+  ###.run ($rootScope, connectionStatus) ->
     $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
       console.log(error)
 
@@ -59,3 +66,27 @@ angular
     connectionStatus.$on 'offline', () ->
       console.log('Go offline')
       $rootScope.isOnline = false
+
+  .run (PushNotifSvc, syncMessage, NotifSvc) ->
+    PushNotifSvc.reSetHandler()
+    console.log 'launching RUN'
+    PushNotifSvc.register('msg', (version) ->
+      console.log('bla  ', version)
+      syncMessage.fetch().then ()->
+        messages = syncMessage.getData()
+        message = messages[0].content
+        console.log 'rcv message : ',message
+        options={
+          TAG:'msg',
+          icon:"https://taiga.mhcomm.fr/images/favicon.png",
+          body:'message : "'+message+'"',
+          dir:'rtl'
+        }
+        NotifSvc.addNotif 'new msg receive', options
+    )
+
+  .run (NotifSvc, $timeout) ->
+    console.log 'run of notif'
+    notif = NotifSvc.addNotif 'test', {body:'I am here to be sure that notifications works', dir:'auto', icon:'https://taiga.mhcomm.fr/images/favicon.png', TAG:"NOTIF"}
+
+  ###

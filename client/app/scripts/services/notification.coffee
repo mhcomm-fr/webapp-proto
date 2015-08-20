@@ -42,6 +42,3 @@ angular.module('webappProtoApp')
       addNotif: addNotif
     }
   )
-.run (NotifSvc, $timeout) ->
-  console.log 'run of notif'
-  notif = NotifSvc.addNotif 'test', {body:'I am here to be sure that notifications works', dir:'auto', icon:'https://taiga.mhcomm.fr/images/favicon.png', TAG:"NOTIF"}
