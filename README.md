@@ -8,8 +8,16 @@ Other constraints:
 * Sync we notif
 
 
-Install dependencies (not tested yet):
+Install global dependencies (not tested yet):
 * Client:
   npm install -g grunt-cli lessc cordova bower
+
+
+Install local dependencies:
+* Client
+  cd client
+  npm install
+  bower install
+
 * Serveur
   pip install -r server/requirements.txt

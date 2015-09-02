@@ -27,20 +27,16 @@ module.exports = function (grunt) {
       // Project settings
       yeoman: appConfig,
 
-
       ngconstant: {
-         options: {
-            name: 'config',
-            dest: 'config.js'
-         },
-         dev: {
-            CONF: {
-               server: 'http://192.168.42.21:9000'
-            }
-         },
-         prod: {
-            CONF: {
-               server: 'http://192.168.42.21:9000'
+         dist: {
+            options: {
+               dest: '<%= yeoman.app %>/scripts/config.js',
+               name: 'config'
+            },
+            constants: {
+               CONF: {
+                  server: 'http://192.168.42.21:9000'
+               }
             }
          }
       },
@@ -436,7 +432,7 @@ module.exports = function (grunt) {
       grunt.task.run([
          'clean:server',
          'wiredep',
-         'ngconstant:dev',
+         'ngconstant:dist',
          'concurrent:server',
          'autoprefixer',
          'configureProxies:livereload',
@@ -452,7 +448,7 @@ module.exports = function (grunt) {
 
    grunt.registerTask('test', [
       'clean:server',
-      'ngconstant:dev',
+      'ngconstant:dist',
       'concurrent:test',
       'autoprefixer',
       'connect:test',
@@ -462,7 +458,7 @@ module.exports = function (grunt) {
    grunt.registerTask('build', [
       'clean:dist',
       'wiredep',
-      'ngconstant:prod',
+      'ngconstant:dist',
       'useminPrepare',
       'concurrent:dist',
       'autoprefixer',

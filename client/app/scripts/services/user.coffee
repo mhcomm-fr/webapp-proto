@@ -17,14 +17,14 @@ Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique vitae, 
 
 
 angular.module('webappProtoApp')
-  .factory('userSrv', ($localStorage, $http, $log, $q, $window) ->
+  .factory('userSrv', ($localStorage, $http, $log, $q, $window, CONF) ->
 
     return {
 
       getLogged: () ->
         defered = $q.defer()
 
-        $http.get('/dj/get_user')
+        $http.get(CONF.server + '/dj/get_user')
         .success (data) ->
           $log.debug('Connected')
           defered.resolve(data)
@@ -36,9 +36,9 @@ angular.module('webappProtoApp')
         return defered.promise
 
       gotoLogin: () ->
-        $window.location.href = "/api-auth/login/?next=/"
+        $window.location.href = CONF.server + "/api-auth/login/?next=" + "/"
 
       logout: () ->
-        $window.location.href = "/api-auth/logout/?next=/api-auth/login/"
+        $window.location.href = CONF.server + "/api-auth/logout/?next=" + CONF.server + "/api-auth/login/"
     }
   )

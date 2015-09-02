@@ -35,12 +35,12 @@ angular.module('webappProtoApp')
         $localStorage.messages.push(mess)
     }
   )
-  .factory('messageSrv', ($resource) ->
-    ress = $resource('/api/messages/:_id/')
+  .factory('messageSrv', ($resource, CONF) ->
+    ress = $resource(CONF.server + '/api/messages/:_id/')
     return ress
   )
-  .factory('restMessage', ($resource) ->
-    ress = $resource('/api/messages/:_id/')
+  .factory('restMessage', ($resource, CONF) ->
+    ress = $resource(CONF.server + '/api/messages/:_id/')
     return {
       query: ress.query
       get: ress.get
