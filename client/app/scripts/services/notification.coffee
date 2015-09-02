@@ -9,6 +9,13 @@
 
 angular.module('webappProtoApp')
   .factory('NotifSvc', ($window, $timeout) ->
+    if !Notification?
+      console.log('No desktop notification on this platform !')
+      return {
+        addNotif: (title, options) ->
+          console.log('Should notify ' + title + ": " + options)
+      }
+
     if Notification.permission isnt "granted"
       Notification.requestPermission (perm) ->
         Notification.permission = perm
