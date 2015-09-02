@@ -18,14 +18,15 @@ angular
     'ui.router',
     'ngStorage',
     'ngTouch',
+    'ngCordova',
     'offline'
   ])
   .config ($stateProvider, $urlRouterProvider, $resourceProvider, $httpProvider) ->
     $resourceProvider.defaults.stripTrailingSlashes = false;
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-    $urlRouterProvider.otherwise("/user/main")
-    #$urlRouterProvider.otherwise("/test")
+    #$urlRouterProvider.otherwise("/user/main")
+    $urlRouterProvider.otherwise("/test")
 
     $stateProvider
     .state('test', {
@@ -85,7 +86,11 @@ angular
         NotifSvc.addNotif 'new msg receive', options
     )
 
-  .run (NotifSvc, $timeout) ->
+  .run (NotifSvc, cordova, $timeout) ->
+
+    cordova.ready.then () ->
+      console.log('Cordova loaded')
+
     console.log 'run of notif'
     notif = NotifSvc.addNotif 'test', {body:'I am here to be sure that notifications works', dir:'auto', icon:'https://taiga.mhcomm.fr/images/favicon.png', TAG:"NOTIF"}
 

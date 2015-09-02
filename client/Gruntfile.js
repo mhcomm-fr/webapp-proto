@@ -31,12 +31,18 @@ module.exports = function (grunt) {
       ngconstant: {
          options: {
             name: 'config',
-            dest: 'config.js',
-            constants: {
+            dest: 'config.js'
+         },
+         dev: {
+            CONF: {
                server: 'http://192.168.42.21:9000'
             }
          },
-         build: {}
+         prod: {
+            CONF: {
+               server: 'http://192.168.42.21:9000'
+            }
+         }
       },
 
       // Watches files for changes and runs tasks based on the changed files
@@ -430,7 +436,7 @@ module.exports = function (grunt) {
       grunt.task.run([
          'clean:server',
          'wiredep',
-         'ngconstant:build',
+         'ngconstant:dev',
          'concurrent:server',
          'autoprefixer',
          'configureProxies:livereload',
@@ -446,7 +452,7 @@ module.exports = function (grunt) {
 
    grunt.registerTask('test', [
       'clean:server',
-      'ngconstant:build',
+      'ngconstant:dev',
       'concurrent:test',
       'autoprefixer',
       'connect:test',
@@ -456,7 +462,7 @@ module.exports = function (grunt) {
    grunt.registerTask('build', [
       'clean:dist',
       'wiredep',
-      'ngconstant:build',
+      'ngconstant:prod',
       'useminPrepare',
       'concurrent:dist',
       'autoprefixer',
